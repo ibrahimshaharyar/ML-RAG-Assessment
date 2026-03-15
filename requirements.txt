@@ -8,9 +8,8 @@ langchain==0.2.16
 langchain-community==0.2.16
 langchain-openai==0.1.23
 langchain-chroma==0.1.4
-
-# OpenAI
-openai==1.45.0
+langchain-groq==0.1.9
+langchain-huggingface==0.0.3
 
 # Vector Store
 chromadb==0.5.15
@@ -22,6 +21,9 @@ uvicorn[standard]==0.30.6
 # Evaluation
 ragas==0.1.21
 datasets==2.21.0
+
+# Embeddings (HuggingFace — free, runs locally)
+sentence-transformers==3.0.1
 
 # Utils
 python-dotenv==1.0.1

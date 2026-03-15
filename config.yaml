@@ -14,14 +14,14 @@ retrieval:
   top_k: 5
 
 llm:
-  provider: openai
-  model: gpt-4o-mini
+  provider: groq
+  model: llama-3.1-8b-instant
   temperature: 0.2
   max_tokens: 512
 
 embeddings:
-  provider: openai
-  model: text-embedding-3-small
+  provider: huggingface
+  model: all-MiniLM-L6-v2
 
 knowledge_base:
   docs_directory: ./knowledge_base
