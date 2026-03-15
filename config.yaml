@@ -1,0 +1,28 @@
+# RAG Pipeline Configuration
+# Modify these values to tune the system
+
+vector_store:
+  provider: chromadb
+  persist_directory: ./chroma_db
+  collection_name: support_docs
+
+chunking:
+  chunk_size: 500
+  chunk_overlap: 50
+
+retrieval:
+  top_k: 5
+
+llm:
+  provider: openai
+  model: gpt-4o-mini
+  temperature: 0.2
+  max_tokens: 512
+
+embeddings:
+  provider: openai
+  model: text-embedding-3-small
+
+knowledge_base:
+  docs_directory: ./knowledge_base
+  file_extension: "*.md"
