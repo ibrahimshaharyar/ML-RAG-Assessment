@@ -15,8 +15,8 @@ from dotenv import load_dotenv
 
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
+from rag.embeddings import ONNXEmbeddings
 
 load_dotenv()
 
@@ -63,14 +63,9 @@ def embed_and_store(chunks, config):
     collection = config["vector_store"]["collection_name"]
     model_name = config["embeddings"]["model"]
 
-    print(f"Embedding chunks with {model_name} ...")
-    print("(First run downloads the model, may take a minute)")
+    print("Embedding chunks with ONNX all-MiniLM-L6-v2 (lightweight, no PyTorch) ...")
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name=model_name,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
+    embeddings = ONNXEmbeddings()
 
     vectorstore = Chroma.from_documents(
         documents=chunks,

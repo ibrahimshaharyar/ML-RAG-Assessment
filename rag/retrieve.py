@@ -12,8 +12,8 @@ import yaml
 from pathlib import Path
 from dotenv import load_dotenv
 
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
+from rag.embeddings import ONNXEmbeddings
 
 load_dotenv()
 
@@ -30,11 +30,7 @@ def load_vectorstore(config):
     collection = config["vector_store"]["collection_name"]
     model_name = config["embeddings"]["model"]
 
-    embeddings = HuggingFaceEmbeddings(
-        model_name=model_name,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
+    embeddings = ONNXEmbeddings()
 
     return Chroma(
         collection_name=collection,

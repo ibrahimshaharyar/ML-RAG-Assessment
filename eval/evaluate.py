@@ -22,12 +22,9 @@ from dotenv import load_dotenv
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_groq import ChatGroq
-from langchain.schema import SystemMessage, HumanMessage
-
 from rag.retrieve import load_config, load_vectorstore, retrieve
 from rag.query import generate_answer
+from rag.embeddings import ONNXEmbeddings
 
 load_dotenv()
 
@@ -154,11 +151,7 @@ def main():
     print("Loading config and models...")
     config = load_config()
 
-    embeddings_model = HuggingFaceEmbeddings(
-        model_name=config["embeddings"]["model"],
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True},
-    )
+    embeddings_model = ONNXEmbeddings()
 
     vectorstore = load_vectorstore(config)
 
