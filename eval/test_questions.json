@@ -1,0 +1,102 @@
+[
+  {
+    "question": "How do I reset my password?",
+    "expected_source": "02_password_reset.md",
+    "reference_answer": "Go to the login page, click Forgot Password, enter your email, and follow the reset link sent to you."
+  },
+  {
+    "question": "How do I enable two-factor authentication?",
+    "expected_source": "03_two_factor_auth.md",
+    "reference_answer": "Go to Settings, then Security, and enable 2FA using an authenticator app or SMS."
+  },
+  {
+    "question": "Why can't I log in to my account?",
+    "expected_source": "04_login_issues.md",
+    "reference_answer": "Possible reasons include wrong password, locked account after failed attempts, unverified email, or 2FA issues."
+  },
+  {
+    "question": "How do I delete my account?",
+    "expected_source": "05_account_deletion.md",
+    "reference_answer": "Go to Settings, then Account, scroll to Danger Zone, and click Delete My Account. There is a 24-hour grace period."
+  },
+  {
+    "question": "What payment methods do you accept?",
+    "expected_source": "09_payment_methods.md",
+    "reference_answer": "We accept Visa, Mastercard, Amex, PayPal, ACH bank transfer, and SEPA direct debit."
+  },
+  {
+    "question": "What is your refund policy?",
+    "expected_source": "10_refund_policy.md",
+    "reference_answer": "New subscribers get a full refund within 7 days. After that, refunds depend on circumstances like duplicate charges or outages."
+  },
+  {
+    "question": "How do I generate an API key?",
+    "expected_source": "11_api_key_management.md",
+    "reference_answer": "Go to Settings, then API Keys, click Generate New Key, give it a name, and copy the key immediately as it is only shown once."
+  },
+  {
+    "question": "What happens when I exceed the rate limit?",
+    "expected_source": "12_rate_limits.md",
+    "reference_answer": "You receive a 429 Too Many Requests response. You should wait and retry after the Retry-After header value."
+  },
+  {
+    "question": "How do I set up a webhook?",
+    "expected_source": "13_webhook_setup.md",
+    "reference_answer": "Go to Settings, then Webhooks, click Add Webhook, enter your HTTPS endpoint URL, select events, and save."
+  },
+  {
+    "question": "How do I install and use the Python SDK?",
+    "expected_source": "14_sdk_quickstart.md",
+    "reference_answer": "Run pip install example-sdk, then create a Client with your API key and call client.query with your question."
+  },
+  {
+    "question": "How do I set up SSO for my organization?",
+    "expected_source": "20_sso_setup.md",
+    "reference_answer": "Go to Settings, then Security, then SSO. Enter your Identity Provider details using SAML 2.0 or OIDC, test, then enable."
+  },
+  {
+    "question": "How do I invite a team member?",
+    "expected_source": "21_team_management.md",
+    "reference_answer": "Go to Settings, then Team, click Invite Member, enter their email, select a role, and send the invite."
+  },
+  {
+    "question": "What can an Admin role do?",
+    "expected_source": "22_role_permissions.md",
+    "reference_answer": "Admins can manage team members, API keys, settings, SSO, and webhooks, but cannot access billing or delete the account."
+  },
+  {
+    "question": "How do I download an invoice?",
+    "expected_source": "08_invoice_download.md",
+    "reference_answer": "Go to Settings, then Billing, then Invoice History, and click the Download PDF button next to the invoice."
+  },
+  {
+    "question": "How do I export my data?",
+    "expected_source": "16_data_export.md",
+    "reference_answer": "Go to Settings, then Data and Privacy, then Export Data. Select the data type, date range, and format, then request the export."
+  },
+  {
+    "question": "What are my rights under GDPR?",
+    "expected_source": "17_gdpr_compliance.md",
+    "reference_answer": "You have rights to access, rectify, erase, port, object to, and restrict processing of your personal data."
+  },
+  {
+    "question": "How do I connect Slack to the platform?",
+    "expected_source": "25_slack_integration.md",
+    "reference_answer": "Go to Settings, then Integrations, then Slack. Click Connect to Slack and authorize. Then invite the bot to a channel."
+  },
+  {
+    "question": "What does error code 429 mean?",
+    "expected_source": "27_error_codes_reference.md",
+    "reference_answer": "Error 429 means rate limit exceeded. You have sent too many requests and need to wait before retrying."
+  },
+  {
+    "question": "What is the uptime SLA for the Pro plan?",
+    "expected_source": "29_sla_policy.md",
+    "reference_answer": "The Pro plan has a 99.9% monthly uptime SLA, which equals approximately 43 minutes of downtime per month."
+  },
+  {
+    "question": "How do I create an account?",
+    "expected_source": "01_account_creation.md",
+    "reference_answer": "Go to the homepage, click Sign Up, fill in your name, email, and password, then verify your email address."
+  }
+]
