@@ -17,9 +17,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY . .
 
-# Run ingestion to pre-build ChromaDB index at build time
-# Uncomment the line below if you want to embed docs during Docker build
-# RUN python rag/ingest.py
+# Pre-build ChromaDB index using HuggingFace embeddings (no API key needed at build time)
+# This bakes the vector store into the image so Render doesn't need to run ingestion at startup
+RUN python -m rag.ingest
 
 EXPOSE 8000
 
