@@ -2,7 +2,7 @@
 
 A production-ready Retrieval-Augmented Generation (RAG) system that answers customer support questions using a knowledge base of 30 markdown documents.
 
-**Live stack:** HuggingFace Embeddings · ChromaDB · Groq Llama 3 · FastAPI · Docker
+**Live stack:** ONNX Embeddings (ChromaDB built-in) · ChromaDB · Groq Llama 3 · FastAPI · Docker
 
 ---
 
@@ -149,7 +149,7 @@ embeddings:
 | Component | Technology |
 |-----------|-----------|
 | LLM | Groq — `llama-3.1-8b-instant` (free) |
-| Embeddings | HuggingFace — `all-MiniLM-L6-v2` (free, local) |
+| Embeddings | ChromaDB built-in ONNX — `all-MiniLM-L6-v2` (free, no PyTorch needed) |
 | Vector Store | ChromaDB (persistent) |
 | API Framework | FastAPI + Uvicorn |
 | Containerisation | Docker + Docker Compose |

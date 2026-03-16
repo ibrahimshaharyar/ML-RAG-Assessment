@@ -13,7 +13,7 @@ flowchart TD
     subgraph Ingestion["Ingestion Pipeline (offline)"]
         A[Markdown Docs\nknowledge_base/] --> B[Document Loader\nTextLoader]
         B --> C[Text Splitter\nRecursiveCharacterTextSplitter\nchunk_size=500, overlap=50]
-        C --> D[HuggingFace Embeddings\nall-MiniLM-L6-v2]
+        C --> D[ONNX Embeddings\nall-MiniLM-L6-v2\nChromaDB Built-in]
         D --> E[(ChromaDB\nPersistent Vector Store)]
     end
 
@@ -44,7 +44,7 @@ Documents are processed offline and stored in ChromaDB before the server starts.
 |------|-----------|---------|
 | Loading | `TextLoader` (LangChain) | Reads `.md` files from `knowledge_base/` |
 | Chunking | `RecursiveCharacterTextSplitter` | chunk_size=500, overlap=50, splits on headers first |
-| Embedding | `HuggingFaceEmbeddings` — `all-MiniLM-L6-v2` | 384-dimensional vectors, runs locally, free |
+| Embedding | ChromaDB built-in ONNX (`all-MiniLM-L6-v2`) | 384-dimensional vectors, runs via ONNX Runtime (no PyTorch), free |
 | Storage | `ChromaDB` (persistent mode) | Stored on disk at `./chroma_db` |
 
 **Why chunk at 500 characters with 50 overlap?**
