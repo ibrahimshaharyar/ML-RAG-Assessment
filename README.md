@@ -1,120 +1,146 @@
-# ML RAG Assessment
+# ML RAG Assessment — Customer Support Assistant
 
-A production-grade Retrieval-Augmented Generation (RAG) customer support assistant built with Python, LangChain, ChromaDB, and OpenAI.
+A production-ready Retrieval-Augmented Generation (RAG) system that answers customer support questions using a knowledge base of 30 markdown documents.
+
+**Live stack:** HuggingFace Embeddings · ChromaDB · Groq Llama 3 · FastAPI · Docker
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Python 3.11, conda
+- A free [Groq API key](https://console.groq.com)
+
+### 1. Set up environment
+
+```bash
+conda create -n rag_assessment python=3.11 -y
+conda activate rag_assessment
+pip install -r requirements.txt
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+# Edit .env — set GROQ_API_KEY=gsk_...
+```
+
+### 3. Build the vector store
+
+```bash
+python -m rag.ingest
+```
+
+Loads all 30 docs from `knowledge_base/`, chunks, embeds, and stores in ChromaDB. First run downloads the embedding model (~90MB).
+
+### 4. Run the API + chat UI
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+Open **http://localhost:8000** — you'll see the chat interface.
+
+### 5. Or run with Docker
+
+```bash
+docker-compose up --build
+```
+
+Then open **http://localhost:8000**.
 
 ---
 
 ## Project Structure
 
 ```
-ml-rag-assessment/
-├── docs/                          # Part 1 & 4 documents
-│   ├── system_design.md
-│   └── production_thinking.md
-├── knowledge_base/                # 30 markdown knowledge base docs
+.
+├── knowledge_base/        # 30 markdown support documents
 ├── rag/
-│   ├── ingest.py                  # Chunk, embed, store to ChromaDB
-│   ├── retrieve.py                # Query ChromaDB, return top-k chunks
-│   └── query.py                   # CLI: question → answer
-├── eval/
-│   ├── test_questions.json
-│   └── evaluate.py                # Retrieval recall + answer quality
+│   ├── ingest.py          # Load → chunk → embed → store to ChromaDB
+│   ├── retrieve.py        # Query ChromaDB, return top-k chunks
+│   └── query.py           # Full pipeline: retrieve + Groq LLM → answer
 ├── app/
-│   └── main.py                    # FastAPI: POST /ask
-├── config.yaml                    # All tuneable parameters
-├── requirements.txt
+│   └── main.py            # FastAPI server (GET / serves chat UI, POST /ask)
+├── frontend/
+│   └── index.html         # ChatGPT-style chat interface
+├── eval/
+│   ├── evaluate.py        # Evaluation: context recall, cosine sim, faithfulness
+│   └── test_questions.json # 20 Q&A test pairs
+├── docs/
+│   ├── system_design.md   # Architecture, MLOps, scaling, evaluation
+│   └── production_thinking.md  # Production Q&A (hallucinations, scaling, cost)
+├── config.yaml            # Tunable parameters (chunk size, model, top-k)
+├── .env.example           # Environment variable template
 ├── Dockerfile
-├── docker-compose.yml
-└── .env.example
+└── docker-compose.yml
 ```
 
 ---
 
-## Quickstart
+## API Endpoints
 
-### 1. Clone & Setup
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/`      | Chat UI     |
+| `GET`  | `/health` | Health check |
+| `POST` | `/ask`   | Submit a question |
 
-```bash
-git clone https://github.com/YOUR_USERNAME/ml-rag-assessment.git
-cd ml-rag-assessment
-
-python3.11 -m venv .venv
-source .venv/bin/activate
-
-pip install -r requirements.txt
-```
-
-### 2. Configure Environment
-
-```bash
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-```
-
-### 3. Ingest Documents
-
-```bash
-python rag/ingest.py
-```
-
-### 4. Ask a Question (CLI)
-
-```bash
-python rag/query.py "How do I reset my password?"
-```
-
-### 5. Run the API Server
-
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-Then send a request:
+**POST /ask** example:
 ```bash
 curl -X POST http://localhost:8000/ask \
   -H "Content-Type: application/json" \
   -d '{"question": "How do I reset my password?"}'
 ```
 
----
-
-## Docker
-
-### Build & Run
-
-```bash
-# First, ingest documents into ChromaDB
-python rag/ingest.py
-
-# Then build and run the container
-docker-compose up --build
+Response:
+```json
+{
+  "question": "How do I reset my password?",
+  "answer": "To reset your password, go to the login page and click Forgot Password...",
+  "sources": ["02_password_reset.md"]
+}
 ```
 
-The API will be available at `http://localhost:8000`
+---
+
+## Evaluation Results
+
+Run the evaluation suite:
+```bash
+python -m eval.evaluate
+```
+
+| Metric | Score |
+|--------|-------|
+| Context Recall | **100%** (20/20 correct docs retrieved) |
+| Avg Cosine Similarity | 0.51 |
+| Answer Relevance | **89.3%** |
+| Faithfulness | **95.0%** |
 
 ---
 
 ## Configuration
 
-All parameters are in `config.yaml`:
+All tuneable parameters are in `config.yaml`:
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `chunking.chunk_size` | 500 | Characters per chunk |
-| `chunking.chunk_overlap` | 50 | Overlap between chunks |
-| `retrieval.top_k` | 5 | Number of chunks to retrieve |
-| `llm.model` | `gpt-4o-mini` | OpenAI model to use |
-| `embeddings.model` | `text-embedding-3-small` | Embedding model |
+```yaml
+chunking:
+  chunk_size: 500
+  chunk_overlap: 50
 
----
+retrieval:
+  top_k: 5
 
-## Evaluation
+llm:
+  model: llama-3.1-8b-instant
+  temperature: 0.2
 
-```bash
-python eval/evaluate.py
+embeddings:
+  model: all-MiniLM-L6-v2
 ```
-
-Outputs retrieval recall and answer relevance scores.
 
 ---
 
@@ -122,20 +148,9 @@ Outputs retrieval recall and answer relevance scores.
 
 | Component | Technology |
 |-----------|-----------|
-| Language | Python 3.11 |
-| RAG Framework | LangChain 0.2.16 |
-| Vector Store | ChromaDB 0.5.15 |
-| LLM | OpenAI GPT-4o-mini |
-| Embeddings | OpenAI text-embedding-3-small |
-| API | FastAPI 0.115.0 |
-| Deployment | Docker + Render |
-
----
-
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `OPENAI_API_KEY` | ✅ | Your OpenAI API key |
-| `CHROMA_PERSIST_DIR` | Optional | Path for ChromaDB (default: `./chroma_db`) |
-| `COLLECTION_NAME` | Optional | ChromaDB collection name (default: `support_docs`) |
+| LLM | Groq — `llama-3.1-8b-instant` (free) |
+| Embeddings | HuggingFace — `all-MiniLM-L6-v2` (free, local) |
+| Vector Store | ChromaDB (persistent) |
+| API Framework | FastAPI + Uvicorn |
+| Containerisation | Docker + Docker Compose |
+| Evaluation | Custom eval with LLM-as-judge |
