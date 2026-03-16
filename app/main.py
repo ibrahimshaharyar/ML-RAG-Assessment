@@ -1,57 +1,57 @@
 """
-app/main.py — FastAPI server exposing the RAG pipeline via REST API.
+app/main.py
+FastAPI server exposing the RAG pipeline via REST API
+and serving the chat frontend UI.
 
 Endpoints:
-    GET  /health      — Health check
-    POST /ask         — Submit a question, get an answer + sources
+    GET  /          — Chat UI (frontend)
+    GET  /health    — Health check
+    POST /ask       — Submit a question, get an answer + sources
 """
 
-import yaml
 from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
 from rag.retrieve import load_vectorstore
 from rag.query import generate_answer, load_config
 
-# ── Startup ───────────────────────────────────────────────────────────────────
 load_dotenv()
 
-# Shared state: load vectorstore once at startup for performance
+FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
+
 _state = {}
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load the ChromaDB vectorstore once when the server starts."""
-    print("🚀 Loading ChromaDB vectorstore...")
+    print("Loading ChromaDB vectorstore...")
     config = load_config()
     _state["config"] = config
     _state["vectorstore"] = load_vectorstore(config)
-    print("✅ Vectorstore loaded. Server ready.")
+    print("Vectorstore loaded. Server ready.")
     yield
     _state.clear()
 
 
-# ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title="ML RAG Assessment API",
-    description="Customer support RAG assistant — ask questions about our knowledge base.",
+    description="Customer support RAG assistant.",
     version="1.0.0",
     lifespan=lifespan,
 )
 
+# Serve the frontend
+app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
-# ── Schemas ───────────────────────────────────────────────────────────────────
+
 class AskRequest(BaseModel):
     question: str
-
-    class Config:
-        json_schema_extra = {
-            "example": {"question": "How do I reset my password?"}
-        }
 
 
 class AskResponse(BaseModel):
@@ -60,30 +60,25 @@ class AskResponse(BaseModel):
     sources: list[str]
 
 
-# ── Routes ────────────────────────────────────────────────────────────────────
+@app.get("/", include_in_schema=False)
+def serve_ui():
+    return FileResponse(str(FRONTEND_DIR / "index.html"))
+
+
 @app.get("/health", tags=["Health"])
 def health_check():
-    """Returns 200 OK if the server is running."""
     return {"status": "ok", "message": "RAG API is running"}
 
 
 @app.post("/ask", response_model=AskResponse, tags=["RAG"])
 def ask(request: AskRequest):
-    """
-    Submit a question and receive an answer generated from the knowledge base.
-
-    - **question**: The question to ask (string, required)
-    """
     question = request.question.strip()
 
     if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
 
     if len(question) > 1000:
-        raise HTTPException(
-            status_code=400,
-            detail="Question is too long. Maximum 1000 characters.",
-        )
+        raise HTTPException(status_code=400, detail="Question is too long. Maximum 1000 characters.")
 
     try:
         result = generate_answer(
@@ -92,10 +87,7 @@ def ask(request: AskRequest):
             vectorstore=_state["vectorstore"],
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An error occurred while processing your question: {str(e)}",
-        )
+        raise HTTPException(status_code=500, detail=f"Error processing question: {str(e)}")
 
     return AskResponse(
         question=result["question"],
